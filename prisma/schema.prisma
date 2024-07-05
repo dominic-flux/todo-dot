@@ -4,8 +4,8 @@ generator client {
 }
 
 datasource db {
-    provider = "mysql"
-    url      = env("DATABASE_URL")
+    provider     = "mysql"
+    url          = env("DATABASE_URL")
     relationMode = "prisma"
 }
 
@@ -54,4 +54,33 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
+    lists         List[]
+    tasks         Task[]
+}
+
+model List {
+    id        String   @id @default(cuid())
+    name      String
+    updatedAt DateTime @updatedAt
+    createdAt DateTime @default(now())
+    userId    String
+    user      User     @relation(fields: [userId], references: [id])
+    tasks     Task[]
+
+    @@index([userId])
+}
+
+model Task {
+    id          String   @id @default(cuid())
+    description String
+    status      Boolean  @default(false)
+    updatedAt   DateTime @updatedAt
+    createdAt   DateTime @default(now())
+    userId      String
+    listId      String
+    user        User     @relation(fields: [userId], references: [id])
+    list        List     @relation(fields: [listId], references: [id])
+
+    @@index([userId])
+    @@index([listId])
 }
