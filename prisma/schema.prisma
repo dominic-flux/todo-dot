@@ -77,8 +77,8 @@ model Task {
     updatedAt   DateTime @updatedAt
     createdAt   DateTime @default(now())
     userId      String
-    listId      String
     user        User     @relation(fields: [userId], references: [id])
+    listId      String
     list        List     @relation(fields: [listId], references: [id])
 
     @@index([userId])
