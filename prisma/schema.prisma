@@ -33,7 +33,7 @@ model Session {
     sessionToken String   @unique
     userId       String
     expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user         User     @relation(fields: [userId], references: [id])
 
     @@index([userId])
 }
@@ -73,7 +73,7 @@ model List {
 model Task {
     id          String   @id @default(cuid())
     description String
-    status      Boolean  @default(false)
+    isCompleted Boolean  @default(false)
     updatedAt   DateTime @updatedAt
     createdAt   DateTime @default(now())
     userId      String
