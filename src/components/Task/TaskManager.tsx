@@ -1,4 +1,6 @@
 import { useState, type FC } from "react";
+import { type inferRouterOutputs } from "@trpc/server";
+import { type AppRouter } from "~/server/api/root";
 
 import TaskItem from "~/components/Task/TaskItem";
 import UpdateListModal from "~/components/Modals/UpdateListModal";
@@ -7,11 +9,15 @@ import CreateTaskModal from "~/components/Modals/CreateTaskModal";
 
 import { FaPlus } from "react-icons/fa6";
 
+type RouterOutput = inferRouterOutputs<AppRouter>;
+type List = RouterOutput["list"]["fetchLists"][0];
+
 interface TaskManagerProps {
-  _?: never;
+  list?: List;
+  refetchList: () => void;
 }
 
-const TaskManager: FC<TaskManagerProps> = () => {
+const TaskManager: FC<TaskManagerProps> = ({ list, refetchList }) => {
   const [showUpdateListModal, setShowUpdateListModal] = useState(false);
   const [showDeleteListModal, setShowDeleteListModal] = useState(false);
   const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
@@ -19,9 +25,7 @@ const TaskManager: FC<TaskManagerProps> = () => {
   return (
     <section className="relative h-full w-full overflow-hidden rounded-3xl bg-[#19191E] p-8 pb-40 shadow-[0px_0px_30px_2px_rgba(17,17,20,1)]">
       <div className="mb-14 flex items-end justify-between">
-        <h1 className="text-4xl font-medium text-[#8C8CCF]">
-          &quot;List Name&quot;
-        </h1>
+        <h1 className="text-4xl font-medium text-[#8C8CCF]">{list?.name}</h1>
 
         <div className="flex items-center justify-end space-x-12">
           <div>
@@ -32,22 +36,35 @@ const TaskManager: FC<TaskManagerProps> = () => {
               Settings
             </span>
 
-            {showUpdateListModal && (
+            {list && showUpdateListModal && (
               <UpdateListModal
-                handleClose={() => setShowUpdateListModal(false)}
+                handleClose={() => {
+                  setShowUpdateListModal(false);
+                  refetchList();
+                }}
                 handleDelete={() => {
                   setShowUpdateListModal(false);
                   setShowDeleteListModal(true);
+                  refetchList();
                 }}
+                listId={list?.id}
+                listName={list?.name}
               />
             )}
-            {showDeleteListModal && (
+            {list && showDeleteListModal && (
               <DeleteListModal
-                handleClose={() => setShowDeleteListModal(false)}
+                handleClose={() => {
+                  setShowDeleteListModal(false);
+                  refetchList();
+                }}
                 handleCancel={() => {
                   setShowDeleteListModal(false);
                   setShowUpdateListModal(true);
+                  refetchList();
                 }}
+                listId={list?.id}
+                listName={list?.name}
+                taskCount={list?.tasks.length}
               />
             )}
           </div>
@@ -73,7 +90,9 @@ const TaskManager: FC<TaskManagerProps> = () => {
       </div>
 
       <div className="my-10 flex h-full flex-col space-y-2 overflow-scroll pb-40">
-        <TaskItem />
+        {list?.tasks.map((task) => {
+          return <TaskItem key={task.id} task={task} />;
+        })}
       </div>
     </section>
   );

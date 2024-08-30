@@ -5,12 +5,14 @@ import UpdateTaskModal from "~/components/Modals/UpdateTaskModal";
 import { MdModeEdit } from "react-icons/md";
 import { IoRemoveCircle } from "react-icons/io5";
 import DeleteTaskModal from "../Modals/DeleteTaskModal";
+import { type Task } from "@prisma/client";
+import { FaCheck } from "react-icons/fa6";
 
 interface TaskItemProps {
-  _?: never;
+  task: Task;
 }
 
-const TaskItem: FC<TaskItemProps> = () => {
+const TaskItem: FC<TaskItemProps> = ({ task }) => {
   const [showUpdateTaskModal, setShowUpdateTaskModal] = useState(false);
   const [showDeleteTaskModal, setShowDeleteTaskModal] = useState(false);
 
@@ -18,9 +20,11 @@ const TaskItem: FC<TaskItemProps> = () => {
     <div className="flex cursor-pointer items-center justify-between rounded-2xl border-2 border-[#19191E] bg-[#302D36] px-5 py-4 text-[#FFFFFF] hover:bg-opacity-80">
       <div className="flex w-full items-center justify-start space-x-5">
         <div className="flex size-8 items-center justify-center rounded-full border-2 border-[#83839E]">
-          {/* <FaCheck className="size-4 text-[#83839E]" /> */}
+          {task.isCompleted && <FaCheck className="size-4 text-[#83839E]" />}
         </div>
-        <h2 className="text-lg">For Dev Meeting</h2>
+        <h2 className={`${task.isCompleted && "line-through"} text-lg`}>
+          {task.description}
+        </h2>
       </div>
 
       <div className="flex items-center justify-end space-x-4">
